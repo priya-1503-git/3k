@@ -1,0 +1,173 @@
+🧩 Q1. Find total number of cases in each continent
+
+🔹 Query
+
+df.groupBy("continent").sum("total_cases").show()
+
+💬 Meaning
+
+It shows how many total COVID cases happened in each continent.
+
+🧾 Example Output
+
+continent	sum(total_cases)
+
+Asia	9000000
+Europe	7500000
+Africa	1200000
+North America	5600000
+
+
+
+---
+
+🧩 Q2. Find total number of deaths in each location
+
+🔹 Query
+
+df.groupBy("location").sum("total_deaths").show()
+
+💬 Meaning
+
+Shows total COVID deaths for each country (location).
+
+🧾 Example Output
+
+location	sum(total_deaths)
+
+India	400000
+USA	650000
+Italy	130000
+
+
+
+---
+
+🧩 Q3. Find maximum number of deaths at locations like ‘Europe’ and ‘Asia’
+
+🔹 Query
+
+df.filter(df.location.isin("Europe", "Asia")).groupBy("location").max("total_deaths").show()
+
+💬 Meaning
+
+Finds which of these locations (Europe or Asia) had the highest total deaths.
+
+🧾 Example Output
+
+location	max(total_deaths)
+
+Europe	650000
+Asia	500000
+
+
+
+---
+
+🧩 Q4. Find total number of people vaccinated at each continent
+
+🔹 Query
+
+df.groupBy("continent").sum("people_vaccinated").show()
+
+💬 Meaning
+
+Shows total number of vaccinated people per continent.
+
+🧾 Example Output
+
+continent	sum(people_vaccinated)
+
+Asia	7000000
+Europe	5000000
+Africa	1500000
+
+
+
+---
+
+🧩 Q5. Find country-wise vaccination for January 2021
+
+🔹 Query
+
+from pyspark.sql.functions import month, year
+df.filter((month("date_current")==1) & (year("date_current")==2021))\
+  .groupBy("location").sum("people_vaccinated").show()
+
+💬 Meaning
+
+Shows how many people got vaccinated in each country during Jan 2021.
+
+🧾 Example Output
+
+location	sum(people_vaccinated)
+
+India	200000
+USA	150000
+Japan	120000
+
+
+
+---
+
+🧩 Q6. Find average total cases across all locations
+
+🔹 Query
+
+from pyspark.sql.functions import avg
+df.agg(avg("total_cases")).show()
+
+💬 Meaning
+
+Calculates the average of total COVID cases for all countries.
+
+🧾 Example Output
+
+avg(total_cases)
+
+420000.5
+
+
+
+---
+
+🧩 Q7. Which continent has highest total number of vaccinations
+
+🔹 Query
+
+df.groupBy("continent").sum("total_vaccinations")\
+  .orderBy("sum(total_vaccinations)", ascending=False).show(1)
+
+💬 Meaning
+
+Finds the continent that has given the most total vaccinations.
+
+🧾 Example Output
+
+continent	sum(total_vaccinations)
+
+Asia	9500000
+
+
+
+---
+
+🧩 Q8. Extract year, month, and day from date_current
+
+🔹 Query
+
+from pyspark.sql.functions import year, month, dayofmonth
+df.withColumn("year", year("date_current"))\
+  .withColumn("month", month("date_current"))\
+  .withColumn("day", dayofmonth("date_current")).show()
+
+💬 Meaning
+
+Splits the date into separate year, month, and day columns.
+
+🧾 Example Output
+
+date_current	year	month	day
+
+2021-01-15	2021	1	15
+2021-02-05	2021	2	5

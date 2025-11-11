@@ -1,0 +1,127 @@
+Step 1: Create Table
+
+CREATE TABLE CovidData (
+  location STRING,
+  continent STRING,
+  total_cases INT,
+  total_deaths INT,
+  people_vaccinated INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+
+---
+
+🧩 Step 2: Load Data
+
+LOAD DATA LOCAL INPATH 'CovidGlobalData.csv'
+INTO TABLE CovidData;
+
+
+---
+
+📘 Example data inside table
+
+location	continent	total_cases	total_deaths	people_vaccinated
+
+India	Asia	10000000	150000	8000000
+USA	North America	20000000	400000	15000000
+UK	Europe	3000000	80000	2000000
+China	Asia	90000	4800	85000
+Israel	Asia	500000	4000	450000
+Australia	Oceania	30000	900	25000
+
+
+
+---
+
+🧩 Step 3: Simple Queries and Outputs
+
+
+---
+
+1️⃣ Show all data
+
+SELECT * FROM CovidData;
+
+Output:
+
+India    Asia           10000000   150000   8000000
+USA      North America  20000000   400000   15000000
+UK       Europe          3000000    80000    2000000
+China    Asia              90000     4800      85000
+Israel   Asia             500000     4000     450000
+Australia Oceania          30000      900      25000
+
+
+---
+
+2️⃣ Total deaths in each continent
+
+SELECT continent, SUM(total_deaths) AS total_deaths
+FROM CovidData
+GROUP BY continent;
+
+Output:
+
+Asia           158800
+North America  400000
+Europe          80000
+Oceania           900
+
+
+---
+
+3️⃣ Total people vaccinated in each country
+
+SELECT location, people_vaccinated
+FROM CovidData;
+
+Output:
+
+India     8000000
+USA       15000000
+UK        2000000
+China     85000
+Israel    450000
+Australia 25000
+
+
+---
+
+4️⃣ Countries starting with “U”
+
+SELECT location, total_cases
+FROM CovidData
+WHERE location LIKE 'U%';
+
+Output:
+
+USA   20000000
+UK     3000000
+
+
+---
+
+5️⃣ Maximum total cases
+
+SELECT MAX(total_cases) AS max_cases FROM CovidData;
+
+Output:
+
+max_cases
+20000000
+
+
+---
+
+6️⃣ Average deaths
+
+SELECT AVG(total_deaths) AS avg_deaths FROM CovidData;
+
+Output:
+
+avg_deaths
+119950

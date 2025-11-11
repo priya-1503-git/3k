@@ -1,0 +1,57 @@
+start-dfs.sh
+start-yarn.sh
+jps
+sudo service mysql start
+mysql -u root -p
+CREATE DATABASE covidDB;
+USE covidDB;
+
+CREATE TABLE CovidData (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    region VARCHAR(50),
+    vaccinated VARCHAR(10),
+    deaths INT
+);
+
+INSERT INTO CovidData VALUES
+(1, 'John', 'India', 'Yes', 450000),
+(2, 'Sara', 'USA', 'No', 800000),
+(3, 'Li', 'China', 'Yes', 500000),
+(4, 'Ravi', 'India', 'No', 350000),
+(5, 'Mark', 'UK', 'Yes', 200000),
+(6, 'Kiran', 'Japan', 'No', 120000);
+
+SELECT * FROM CovidData;
+
+
+OUTPUT
++----+-------+--------+-------------+--------+
+| id | name  | region | vaccinated  | deaths |
++----+-------+--------+-------------+--------+
+|  1 | John  | India  | Yes         | 450000 |
+|  2 | Sara  | USA    | No          | 800000 |
+|  3 | Li    | China  | Yes         | 500000 |
+|  4 | Ravi  | India  | No          | 350000 |
+|  5 | Mark  | UK     | Yes         | 200000 |
+|  6 | Kiran | Japan  | No          | 120000 |
++----+-------+--------+-------------+--------+
+
+hdfs dfs -mkdir /CovidHDFS
+sqoop import \
+--connect jdbc:mysql://localhost/covidDB \
+--username root \
+--password yourpassword \
+--table CovidData \
+--m 1 \
+--target-dir /CovidHDFS
+hdfs dfs -ls /CovidHDFS
+hdfs dfs -cat /CovidHDFS/part-m-00000
+OUTPUT
+-------
+1,John,India,Yes,450000
+2,Sara,USA,No,800000
+3,Li,China,Yes,500000
+4,Ravi,India,No,350000
+5,Mark,UK,Yes,200000
+6,Kiran,Japan,No,120000

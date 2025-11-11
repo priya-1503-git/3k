@@ -1,0 +1,112 @@
+Step-by-step Explanation
+🧰 1️⃣ Install and Set Up Hadoop
+sudo apt update
+sudo apt install openjdk-11-jdk -y
+
+
+Updates your package list and installs Java 11, which Hadoop requires to run.
+
+wget https://downloads.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
+tar -xvzf hadoop-3.3.6.tar.gz
+sudo mv hadoop-3.3.6 /usr/local/hadoop
+
+
+Downloads Hadoop 3.3.6
+
+Extracts it
+
+Moves it into /usr/local/hadoop for system-wide access
+
+⚙️ 2️⃣ Start Hadoop Services
+start-dfs.sh
+start-yarn.sh
+
+
+start-dfs.sh: starts HDFS (NameNode + DataNode)
+
+start-yarn.sh: starts YARN (resource manager + node manager)
+
+📂 3️⃣ Create a Directory and Upload Data into HDFS
+hdfs dfs -mkdir /covid_data
+hdfs dfs -put covid_dataset.csv /covid_data/
+hdfs dfs -ls /covid_data
+
+
+Creates a folder /covid_data in HDFS
+
+Uploads your covid_dataset.csv into that folder
+
+Lists the contents to confirm upload
+
+🐝 PART 2: Hive Commands (SQL on Hadoop)
+
+Hive allows you to query large datasets stored in Hadoop using an SQL-like syntax.
+
+🧩 Step-by-step Explanation
+🗄️ 1️⃣ Create and Use Database
+CREATE DATABASE covid_analysis;
+USE covid_analysis;
+
+
+Creates a new database covid_analysis
+
+Switches Hive context to that database
+
+🧾 2️⃣ Create Table Structure
+CREATE TABLE covid_data (
+  Date STRING,
+  Country STRING,
+  Continent STRING,
+  TotalCases INT,
+  TotalDeaths INT,
+  TotalRecovered INT,
+  Vaccinated INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+
+Defines a table schema for your dataset
+
+The table expects comma-separated text files (CSV format)
+
+The data will be read from HDFS storage
+
+📤 3️⃣ Load Data into Hive Table
+LOAD DATA INPATH '/covid_data/covid_dataset.csv' INTO TABLE covid_data;
+
+
+Loads the CSV file from HDFS path (/covid_data/) into the Hive table
+
+Hive does not copy the data; it references it from HDFS
+
+📊 4️⃣ Run Hive Queries (SQL Analysis)
+
+1️⃣ Global total infections
+
+SELECT SUM(TotalCases) AS GlobalInfected FROM covid_data;
+
+
+→ Returns the total number of cases across all countries.
+
+2️⃣ Cases per Continent
+
+SELECT Continent, SUM(TotalCases) AS Cases FROM covid_data GROUP BY Continent;
+
+
+→ Groups data by continent and sums total cases per group.
+
+3️⃣ Country with Maximum Deaths
+
+SELECT Country, MAX(TotalDeaths) AS MaxDeaths FROM covid_data;
+
+
+→ Finds the country with the highest death count.
+
+4️⃣ Total Vaccinated People
+
+SELECT SUM(Vaccinated) AS TotalVaccinated FROM covid_data;
+
+
+→ Sums up all vaccinated numbers globally.
