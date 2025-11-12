@@ -1,0 +1,123 @@
+Step 1: Create a new HDFS directory called CovidHDFS
+
+Command:
+
+hdfs dfs -mkdir /CovidHDFS
+hdfs dfs -ls /
+
+👉 This creates a directory in HDFS to store your imported data.
+
+
+---
+
+Step 2: Import data from MySQL table CovidData into HDFS
+
+You’ll use Sqoop import here.
+
+Command:
+
+sqoop import \
+--connect jdbc:mysql://localhost/databasename \
+--username root \
+--password yourpassword \
+--table CovidData \
+--m 1 \
+--target-dir /CovidHDFS
+
+🧠 Explanation:
+
+--connect → MySQL connection string
+
+--table CovidData → Your MySQL table
+
+--m 1 → Single mapper (as required)
+
+--target-dir → Destination HDFS folder
+
+
+✅ After import, check data:
+
+hdfs dfs -ls /CovidHDFS
+
+
+---
+
+Step 3: Copy files from CovidHDFS to backup folder CovidData_Backup
+
+Command:
+
+hdfs dfs -cp /CovidHDFS /CovidData_Backup
+
+Check it:
+
+hdfs dfs -ls /CovidData_Backup
+
+
+---
+
+Step 4: Display first 1 KB of data
+
+Command:
+
+hdfs dfs -cat /CovidHDFS/part-m-00000 | head -c 1024
+
+📍(Hint: “head” → first bytes of file)
+
+
+---
+
+Step 5: Display last 1 KB of data
+
+Command:
+
+hdfs dfs -cat /CovidHDFS/part-m-00000 | tail -c 1024
+
+📍(Hint: “tail” → last bytes of file)
+
+
+---
+
+Step 6: Transfer only Asia-related records
+
+Here, you’ll filter during Sqoop import using --where condition.
+
+Command:
+
+sqoop import \
+--connect jdbc:mysql://localhost/databasename \
+--username root \
+--password yourpassword \
+--table CovidData \
+--m 1 \
+--target-dir /SqoopCovid.AsiaData \
+--where "continent='Asia'"
+
+✅ This imports only rows where the continent column = 'Asia'.
+
+
+---
+
+Step 7: Transfer only non-vaccinated people
+
+Same logic — filter using --where again.
+
+Command:
+
+sqoop import \
+--connect jdbc:mysql://localhost/databasename \
+--username root \
+--password yourpassword \
+--table CovidData \
+--m 1 \
+--target-dir /SqoopNonVaccinated \
+--where "vaccinated='No'"
+
+
+---
+
+✅ Final HDFS Verification
+
+hdfs dfs -ls /
+hdfs dfs -cat /SqoopCovid.AsiaData/part-m-00000 | head
+hdfs dfs -cat /SqoopNonVaccinated/part-m-00000 | head
+
